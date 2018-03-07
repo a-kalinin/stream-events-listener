@@ -1,0 +1,24 @@
+.ConnectionStatus{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+.ConnectionStatus:before{
+    content:'Connection';
+    margin-right: 5px;
+}
+
+.ConnectionStatus:after{
+    content:'';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #f00;
+}
+
+.ConnectionStatus[data-connection-established="true"]:after{
+    background-color: #0F0;
+}
+

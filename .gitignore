@@ -127,3 +127,4 @@ typings/
 .env
 
 
+/client/src/plugins/TwitchConnection/TwitchApiCredentials.js

@@ -1,0 +1,30 @@
+.info{
+    margin: 0 auto;
+    font-size: 24px;
+    color: #666;
+    background-color: #eee;
+}
+
+.info td{
+    padding: 10px;
+}
+.info td:first-child{
+    text-align: right;
+    color: #00B7FF;
+}
+.info td:first-child:after{
+    content: ':';
+}
+
+.info td:last-child{
+    text-align: left;
+}
+
+.avatar{
+    width: 300px;
+    height: 200px;
+    margin: 10px auto;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
