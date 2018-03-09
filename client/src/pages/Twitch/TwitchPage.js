@@ -10,7 +10,7 @@ import SoundPlay from '../../comps/SoundPlay/SoundPlay.js';
 import TwitchApiCredentials from '../../plugins/TwitchApiCredentials/TwitchApiCredentials.js';
 import { Link } from 'react-router-dom';
 // import { Redirect } from 'react-router-dom';
-import './TwitchPage.css';
+import './TwitchPage.scss';
 
 class TwitchPage extends Component {
     constructor(props){
@@ -25,7 +25,7 @@ class TwitchPage extends Component {
             image: '',
             streamId: '',
             title: '',
-            watching: false,
+            viewersCount: false,
         };
     }
 
@@ -44,15 +44,15 @@ class TwitchPage extends Component {
         this.setState( function(prevState, props) {
             let addProps = {
                 connectionEstablished: true,
-                watchingDiff: 0,
+                viewersCountDiff: 0,
             };
 
-            if(data.hasOwnProperty('watching')){
-                if(prevState.watching === false){
-                    addProps.watchingDiff = 0;
+            if(data.hasOwnProperty('viewersCount')){
+                if(prevState.viewersCount === false){
+                    addProps.viewersCountDiff = 0;
                 }
-                else if(prevState.watching !== data.watching) {
-                    addProps.watchingDiff = data.watching - prevState.watching;
+                else if(prevState.viewersCount !== data.viewersCount) {
+                    addProps.viewersCountDiff = data.viewersCount - prevState.viewersCount;
                 }
             }
             return Object.assign(addProps, data)
@@ -64,15 +64,15 @@ class TwitchPage extends Component {
         // this.setState( function(prevState, props) {
         //     let addProps = {
         //         connectionEstablished: true,
-        //         watchingDiff: 0,
+        //         viewersCountDiff: 0,
         //     };
         //
-        //     if(data.hasOwnProperty('watching')){
-        //         if(prevState.watching === false){
-        //             addProps.watchingDiff = 0;
+        //     if(data.hasOwnProperty('viewersCount')){
+        //         if(prevState.viewersCount === false){
+        //             addProps.viewersCountDiff = 0;
         //         }
-        //         else if(prevState.watching !== data.watching) {
-        //             addProps.watchingDiff = data.watching - prevState.watching;
+        //         else if(prevState.viewersCount !== data.viewersCount) {
+        //             addProps.viewersCountDiff = data.viewersCount - prevState.viewersCount;
         //         }
         //     }
         //     return Object.assign(addProps, data)
@@ -110,23 +110,23 @@ class TwitchPage extends Component {
         }
 
         let sound = null;
-        if(this.state.watchingDiff > 0){
+        if(this.state.viewersCountDiff > 0){
             sound = <SoundPlay src="/sounds/hello-button.mp3"/>;
         }
-        else if(this.state.watchingDiff < 0){
+        else if(this.state.viewersCountDiff < 0){
             sound = <SoundPlay src="/sounds/bah-bye.mp3"/>;
         }
         const link ='https://twitch.tv/'+this.streamer;
 
 
-        return <div className="">
+        return <div className="TwitchPage">
             <ConnectionStatus connected={this.state.connectionEstablished}/>
             <h1>{this.streamer} <Link to='/' className="homeLink" /></h1>
             <table className="info">
                 <tbody>
                     <tr><td>Name</td><td>{this.state.displayName}</td></tr>
                     <tr><td>Stream</td><td>{this.state.title}</td></tr>
-                    <tr><td>Watching</td><td>{this.state.watching}</td></tr>
+                    <tr><td>Watching</td><td>{this.state.viewersCount}</td></tr>
                     <tr><td>Link</td><td><a href={link} target="_blanc">{link}</a></td></tr>
                 </tbody>
             </table>

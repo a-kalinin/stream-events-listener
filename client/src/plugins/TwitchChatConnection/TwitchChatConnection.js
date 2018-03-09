@@ -14,7 +14,7 @@ class TwitchChatConnection {
             // image: '',
             // streamId: '',
             // title: '',
-            // watching: 0,
+            // viewersCount: 0,
         };
         this.onChange = onChange;
 

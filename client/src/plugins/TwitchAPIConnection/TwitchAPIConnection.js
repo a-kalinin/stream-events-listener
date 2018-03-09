@@ -14,7 +14,7 @@ class TwitchConnection {
             image: '',
             streamId: '',
             title: '',
-            watching: 0,
+            viewersCount: 0,
         };
         this.onChange = onChange;
 
@@ -133,12 +133,12 @@ class TwitchConnection {
         this.getStreamInfo(function(response){
             const data = (response.data && response.data[0]) || {};
             if(
-                data.viewer_count !== old.watching
+                data.viewer_count !== old.viewersCount
                 || data.id !== old.streamId
                 || data.title !== old.title
             ){
                 this._onChange({
-                    watching: data.viewer_count,
+                    viewersCount: data.viewer_count,
                     streamId: data.id,
                     title: data.title,
                 });

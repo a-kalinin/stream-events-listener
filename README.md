@@ -1,6 +1,7 @@
 # stream-events-listener
 
 Tool to monitor stream events
+
 Supported services - Twitch
 
 Supported events:
@@ -12,7 +13,7 @@ Also shows some additional information about stream
 
 Data getting from Twitch API and Twitch IRC connection
 
-Used technologies are: Node.js, React
+What is used: Node.js, React, SASS, REST API, Babel, Webpack, WebSockets, IRC chat.
 
 To install
 ```
@@ -24,9 +25,4 @@ npm i
 To start
 ```
 npm start
-```
-
-To attach any channel, change url to next view
-```
-http://localhost:4444/<twitch username>
 ```

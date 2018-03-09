@@ -101,16 +101,6 @@ module.exports = {
   module: {
     strictExportPresence: true,
     rules: [
-        {
-            test: /\.scss$/,
-            use: [{
-                loader: "style-loader" // creates style nodes from JS strings
-            }, {
-                loader: "css-loader" // translates CSS into CommonJS
-            }, {
-                loader: "sass-loader" // compiles Sass to CSS
-            }]
-        },
       // TODO: Disable require.ensure as it's not a standard language feature.
       // We are waiting for https://github.com/facebookincubator/create-react-app/issues/2176.
       // { parser: { requireEnsure: false } },
@@ -160,6 +150,38 @@ module.exports = {
               // directory for faster rebuilds.
               cacheDirectory: true,
             },
+          },
+          {
+            test: /\.scss$/,
+            use: [{
+              loader: "style-loader", // creates style nodes from JS strings
+              options: {
+                  importLoaders: 1,
+              },
+            }, {
+              loader: "css-loader", // translates CSS into CommonJS
+            }, {
+              loader: require.resolve('postcss-loader'),
+              options: {
+                // Necessary for external CSS imports to work
+                // https://github.com/facebookincubator/create-react-app/issues/2677
+                ident: 'postcss',
+                plugins: () => [
+                  require('postcss-flexbugs-fixes'),
+                  autoprefixer({
+                    browsers: [
+                      '>1%',
+                      'last 4 versions',
+                      'Firefox ESR',
+                      'not ie < 9', // React doesn't support IE8 anyway
+                    ],
+                    flexbox: 'no-2009',
+                  }),
+                ],
+              },
+            }, {
+              loader: "sass-loader", // compiles Sass to CSS
+            }]
           },
           // "postcss" loader applies autoprefixer to our CSS.
           // "css" loader resolves paths in CSS and adds assets as dependencies.

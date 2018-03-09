@@ -107,16 +107,6 @@ module.exports = {
   module: {
     strictExportPresence: true,
     rules: [
-        {
-            test: /\.scss$/,
-            use: [{
-                loader: "style-loader" // creates style nodes from JS strings
-            }, {
-                loader: "css-loader" // translates CSS into CommonJS
-            }, {
-                loader: "sass-loader" // compiles Sass to CSS
-            }]
-        },
       // TODO: Disable require.ensure as it's not a standard language feature.
       // We are waiting for https://github.com/facebookincubator/create-react-app/issues/2176.
       // { parser: { requireEnsure: false } },
@@ -162,6 +152,38 @@ module.exports = {
               
               compact: true,
             },
+          },
+          {
+            test: /\.scss$/,
+            fallback: {
+              loader: require.resolve('style-loader'),
+              options: {
+                hmr: false,
+              },
+            },
+            use: [
+              {
+                loader: "css-loader", // translates CSS into CommonJS
+                options: {
+                    importLoaders: 1,
+                    minimize: true,
+                    sourceMap: shouldUseSourceMap,
+                },
+              },
+              {
+                loader: require.resolve('postcss-loader'), options: {
+                  // Necessary for external CSS imports to work
+                  // https://github.com/facebookincubator/create-react-app/issues/2677
+                  ident: 'postcss', plugins: () => [require('postcss-flexbugs-fixes'), autoprefixer({
+                    browsers: ['>1%', 'last 4 versions', 'Firefox ESR', 'not ie < 9', // React doesn't support IE8 anyway
+                    ], flexbox: 'no-2009',
+                  }),],
+                },
+              },
+              {
+                loader: "sass-loader" // compiles Sass to CSS
+              }
+            ]
           },
           // The notation here is somewhat confusing.
           // "postcss" loader applies autoprefixer to our CSS.

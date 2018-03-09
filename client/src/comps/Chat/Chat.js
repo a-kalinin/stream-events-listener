@@ -3,7 +3,7 @@
  */
 import React, { Component } from 'react';
 import ChatMessage from './ChatMessage.js';
-import './Chat.css';
+import './Chat.scss';
 
 class Chat extends Component{
     render(){

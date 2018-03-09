@@ -1,44 +1,45 @@
-.info{
+.TwitchPage{
+  .info {
     margin: 0 auto;
     font-size: 24px;
     color: #666;
     background-color: #eee;
-}
 
-.info td{
-    padding: 10px;
-}
-.info td:first-child{
-    text-align: right;
-    color: #00B7FF;
-}
-.info td:first-child:after{
-    content: ':';
-}
+    td {
+      padding: 10px;
+    }
+    td:first-child {
+      text-align: right;
+      color: #00B7FF;
+    }
+    td:first-child:after {
+      content: ':';
+    }
 
-.info td:last-child{
-    text-align: left;
-}
+    td:last-child {
+      text-align: left;
+    }
+  }
 
-.avatar{
+  .avatar{
     width: 300px;
     height: 200px;
     margin: 10px auto;
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
-}
+  }
 
-.homeLink{
+  .homeLink{
     display: inline-block;
     position: relative;
     width: 20px;
     height: 20px;
     border: 1px solid #ddd;
     background-color: #f9f9f9;
-}
-.homeLink:before,
-.homeLink:after{
+  }
+  .homeLink:before,
+  .homeLink:after{
     content: '';
     position: absolute;
     bottom:50%;
@@ -46,10 +47,11 @@
     width:15px;
     border-bottom:1px solid red;
     transform-origin: 0 50%;
-}
-.homeLink:before{
+  }
+  .homeLink:before{
     transform: rotate(-45deg) translateX(-50%);
-}
-.homeLink:after{
+  }
+  .homeLink:after{
     transform: rotate(45deg) translateX(-50%);
+  }
 }
