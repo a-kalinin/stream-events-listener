@@ -23,7 +23,11 @@ router.get('/:id', function(req, res, next) {
     //     }
     // });
 
-    res.json({status: 'ok', id: req.params.id} );
+    res.json({ status: 'ok', id: req.params.id } );
+});
+router.get('/', function(req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.json({ status: 'error', error: 'ID parameter missed' } );
 });
 
 module.exports = router;

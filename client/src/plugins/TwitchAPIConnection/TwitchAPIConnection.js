@@ -1,7 +1,7 @@
 /**
  * Created by Alex on 16.02.2018.
  */
-import TwitchApiCredentials from './TwitchApiCredentials.js';
+import TwitchApiCredentials from '../TwitchApiCredentials/TwitchApiCredentials.js';
 
 class TwitchConnection {
     constructor(streamer, onChange){
@@ -18,8 +18,8 @@ class TwitchConnection {
         };
         this.onChange = onChange;
 
-        this.updateUserInfo();
-        this.runStreamChecker();
+        this.runStreamChecker = this.runStreamChecker.bind(this);
+        this.updateUserInfo(this.runStreamChecker);
     }
 
     _onChange(data){
@@ -32,9 +32,10 @@ class TwitchConnection {
     }
 
     runStreamChecker(){
+        this.updateStreamInfo();
         this.updateStreamInfoTimerID = setInterval(
             () => this.updateStreamInfo(),
-            5000
+            10000
         );
     }
 
@@ -84,13 +85,13 @@ class TwitchConnection {
         }.bind(this));
     }
 
-    updateUserInfo(){
+    updateUserInfo(callback){
         const old = this.data;
         this.getUserInfo( function(response){
-            const data = response.data[0] || {};
+            const data = (response.data && response.data[0]) || {};
             if(
                 old.name !== data.name
-                ||old.displayName !== data.display_name
+                || old.displayName !== data.display_name
                 || old.userId !== data.id
                 || old.image !== data.profile_image_url
             ){
@@ -101,6 +102,7 @@ class TwitchConnection {
                     image: data.profile_image_url,
                 });
             }
+            callback && callback();
         }.bind(this))
     }
 
@@ -113,6 +115,8 @@ class TwitchConnection {
             myInit = {
                 method: 'GET', headers: myHeaders, cache: 'no-store'
             };
+
+        if(!id) debugger;
 
         fetch(url, myInit).then(function (response) {
             return response.json();
@@ -127,7 +131,7 @@ class TwitchConnection {
     updateStreamInfo(){
         const old = this.data;
         this.getStreamInfo(function(response){
-            const data = response.data[0] || {};
+            const data = (response.data && response.data[0]) || {};
             if(
                 data.viewer_count !== old.watching
                 || data.id !== old.streamId

@@ -3,7 +3,9 @@ import './App.css';
 // import Connection from './plugins/Connection/Connection.js';
 // import ConnectionStatus from './comps/ConnectionStatus/ConnectionStatus.js';
 import TwitchPage from './pages/Twitch/TwitchPage.js';
-import { BrowserRouter , Route, Switch/*, Link*/ } from 'react-router-dom';
+import OAuth from './pages/OAuth/OAuth.js';
+import Home from './pages/Home/Home.js';
+import { BrowserRouter , Route, Switch, Redirect/*, Link*/ } from 'react-router-dom';
 
 class App extends Component {
     constructor(props){
@@ -35,7 +37,9 @@ class App extends Component {
             <BrowserRouter>
                 <div className="App">
                     <Switch>
+                        <Route exact path='/oauth' component={OAuth} />
                         <Route exact path='/:streamer' component={TwitchPage} />
+                        <Route exact path='/' component={Home} />
                         {/*<Route exact path='/' render={(props)=>{
                             return <div>
                                 <ConnectionStatus connected={this.state.connectionEstablished}/>
@@ -44,6 +48,7 @@ class App extends Component {
                                 </Section>
                             </div>
                         }} />*/}
+                        <Redirect to="/" />
                     </Switch>
                 </div>
             </BrowserRouter>
@@ -51,15 +56,5 @@ class App extends Component {
     }
 }
 
-
-// function Section(props){
-//     return <section>
-//         {props.children}
-//     </section>;
-// }
-
-// function Header(props){
-//     return <h1>{props.children}</h1>;
-// }
 
 export default App;
