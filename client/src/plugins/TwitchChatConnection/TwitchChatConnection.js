@@ -4,64 +4,38 @@
 import TwitchApiCredentials from '../TwitchApiCredentials/TwitchApiCredentials.js';
 
 class TwitchChatConnection {
-    constructor(streamer, onChange){
-        this.streamer = streamer;
+    constructor(username, channel, authToken, eventHandler){
         this.credentials = new TwitchApiCredentials();
-        this.url = 'https://api.twitch.tv/kraken/oauth2/token';
-        this.data = {
-            // userId: '',
-            // name: '',
-            // image: '',
-            // streamId: '',
-            // title: '',
-            // viewersCount: 0,
-        };
-        this.onChange = onChange;
+        this.eventHandler = eventHandler;
 
-        this.username = this.streamer;
-        this.password = sessionStorage.twitchOAuthToken && 'oauth:'+sessionStorage.twitchOAuthToken;
-        // this.channel = '#'+ this.streamer;
-        this.channel = '#'+ this.streamer;
+        this.username = channel;
+        this.password = 'oauth:'+ authToken;
+        this.channel = '#'+ channel;
         this.server = 'irc-ws.chat.twitch.tv';
         this.port = 443;
-
         this.open();
     }
 
     open(){
         this.webSocket = new WebSocket('wss://' + this.server + ':' + this.port + '/', 'irc');
-        this.webSocket.onmessage = this.onMessage.bind(this);
-        this.webSocket.onerror = this.onError.bind(this);
-        this.webSocket.onclose = this.onClose.bind(this);
-        this.webSocket.onopen = this.onOpen.bind(this);
+        this.webSocket.onmessage = this.handleMessage.bind(this);
+        this.webSocket.onerror = this.handleError.bind(this);
+        this.webSocket.onclose = this.handleClose.bind(this);
+        this.webSocket.onopen = this.handleOpen.bind(this);
     }
 
-    onError(message){
-        console.log('Chat error: ' + message);
+    handleError(message){
+        console.warn('Chat error: ' + message);
     };
 
-    onMessage(message){
+    handleMessage(message){
         if(message !== null){
-            let parsed = this.parseMessage(message.data);
-            // console.log(message.data);
-            if(parsed !== null){
-                if(parsed.command === "PRIVMSG") {
-                    let userPoints = localStorage.getItem(parsed.username);
-
-                    if(userPoints === null){
-                        localStorage.setItem(parsed.username, 10);
-                    }
-                    else {
-                        localStorage.setItem(parsed.username, parseFloat(userPoints) + 0.25);
-                    }
-                } else if(parsed.command === "PING") {
-                    this.webSocket.send("PONG :" + parsed.message);
-                }
-            }
+            let parsed = this.parseRawMessage(message.data);
+            parsed !== null && this.processMessage(parsed);
         }
     };
 
-    onOpen(){
+    handleOpen(){
         let socket = this.webSocket;
         if (socket !== null && socket.readyState === 1) {
             socket.send('CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership');
@@ -71,8 +45,8 @@ class TwitchChatConnection {
         }
     };
 
-    onClose(){
-        console.log('Disconnected from the chat server.');
+    handleClose(){
+        console.warn('Disconnected from the chat server.');
     };
 
     close(){
@@ -81,72 +55,86 @@ class TwitchChatConnection {
         }
     };
 
-    parseMessage(rawMessage) {
+    parseRawMessage(rawMessage) {
+        if (rawMessage.startsWith("PING")) {
+            return { command: "PING", message: rawMessage.split(":")[1] };
+        }
+
         let parsedMessage = {
-            message: null,
-            tags: null,
-            command: null,
-            original: rawMessage,
-            channel: null,
-            username: null
-        };
+                message: null,
+                tags: null,
+                command: null,
+                original: rawMessage,
+                channel: null,
+                username: null
+            },
+            tagsIncluded = rawMessage[0] === '@',
+            tagsString = tagsIncluded && rawMessage.slice(1).split(' ')[0],
+            tagsArray = tagsString && tagsString.split(';'),
+            tagsStrippedString = tagsIncluded ? ':' + rawMessage.split(' ').slice(1).join(' ') : rawMessage,
+            commonRegExp = /^:(\S+)!(?:\S+)@(?:\S+).tmi.twitch.tv (JOIN|PART|PRIVMSG) #(\S+) ?:?(.*)\s/,
+            matches = tagsStrippedString.match(commonRegExp),
+            userListRegExp = /^:(\S+).tmi.twitch.tv 353 (?:\S+) = #(\S+) :(.*)/;
 
+        // GLOBALUSERSTATE
+        // CLEARCHAT
+        // ROOMSTATE
+        // USERNOTICE
+        // USERSTATE
 
-        if(rawMessage[0] === '@'){
-            let tagIndex = rawMessage.indexOf(' '),
-                userIndex = rawMessage.indexOf(' ', tagIndex + 1),
-                commandIndex = rawMessage.indexOf(' ', userIndex + 1),
-                channelIndex = rawMessage.indexOf(' ', commandIndex + 1),
-                messageIndex = rawMessage.indexOf(':', channelIndex + 1);
+        // :<user>!<user>@<user>.tmi.twitch.tv JOIN #<channel>
+        // :<user>!<user>@<user>.tmi.twitch.tv PART #<channel>
+        // :<user>!<user>@<user>.tmi.twitch.tv PRIVMSG #<channel> :This is a sample message
+        if (matches){
+            parsedMessage.username = matches[1];
+            parsedMessage.command = matches[2];
+            parsedMessage.channel = matches[3];
+            parsedMessage.message = matches[2] === 'PRIVMSG' ? matches[4] : null;
+        }
+        // :<user>.tmi.twitch.tv 353 <user> = #<channel> :<user> <user2> <user3>
+        // :<user>.tmi.twitch.tv 353 <user> = #<channel> :<user4> <user5> ... <userN>
+        // :<user>.tmi.twitch.tv 366 <user> #<channel> :End of /NAMES list
+        else if(matches = tagsStrippedString.match(userListRegExp)){
+            let strings = tagsStrippedString.split("/n"),
+                users = [];
 
-            parsedMessage.tags = rawMessage.slice(0, tagIndex);
-            parsedMessage.username = rawMessage.slice(tagIndex + 2, rawMessage.indexOf('!'));
-            parsedMessage.command = rawMessage.slice(userIndex + 1, commandIndex);
-            parsedMessage.channel = rawMessage.slice(commandIndex + 1, channelIndex);
-            parsedMessage.message = rawMessage.slice(messageIndex + 1);
-        } else if(/^:[\w\d_]+!/.test(rawMessage)){
-            let user = rawMessage.trim(':').split('!')[0],
-                strings = rawMessage.split("\n");
-            console.log('!!!!! user '+ user);
+            parsedMessage.username = matches[1];
+            parsedMessage.command = 'NAMES';
+            parsedMessage.channel = matches[2];
 
-            for (let i=0; i< strings.length; i++){
-
+            for(let string of strings){
+                let [,,,usersInString] = string.match(userListRegExp);
+                usersInString && users.push(...usersInString.split(/\s/));
             }
+            parsedMessage.message = users;
+        }
+        else{
+            // debugger
+        }
 
-            // let tagIndex = rawMessage.indexOf(' '),
-            //     userIndex = rawMessage.indexOf(' ', tagIndex + 1),
-            //     commandIndex = rawMessage.indexOf(' ', userIndex + 1),
-            //     channelIndex = rawMessage.indexOf(' ', commandIndex + 1),
-            //     messageIndex = rawMessage.indexOf(':', channelIndex + 1);
-            //
-            // parsedMessage.tags = rawMessage.slice(0, tagIndex);
-            // parsedMessage.username = rawMessage.slice(tagIndex + 2, rawMessage.indexOf('!'));
-            // parsedMessage.command = rawMessage.slice(userIndex + 1, commandIndex);
-            // parsedMessage.channel = rawMessage.slice(commandIndex + 1, channelIndex);
-            // parsedMessage.message = rawMessage.slice(messageIndex + 1);
-        } else if(rawMessage.startsWith("PING")) {
-            parsedMessage.command = "PING";
-            parsedMessage.message = rawMessage.split(":")[1];
+        if( tagsArray ){
+            let tagsObj = {};
+            tagsArray.forEach(tag => {
+                let arr = tag.split('=');
+                tagsObj[arr[0]] = arr[1];
+            });
+            parsedMessage.tags = tagsObj;
         }
 
         return parsedMessage;
     }
 
-
-
-
-
-
-
-    _onChange(data){
-        this.data = Object.assign({}, this.data, data);
-        this.onChange && this.onChange(data);
+    processMessage(message){
+        if (message.command === "PING") {
+            this.webSocket.send("PONG :" + message.message);
+        } else if (message.command){
+            this.eventHandler && this.eventHandler(message);
+        }
     }
 
     destroy(){
         this.close();
     }
-
 }
 
 export default TwitchChatConnection;

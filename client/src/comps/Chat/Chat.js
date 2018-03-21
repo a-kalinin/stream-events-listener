@@ -2,17 +2,48 @@
  * Created by Alex on 09.03.2018.
  */
 import React, { Component } from 'react';
-import ChatMessage from './ChatMessage.js';
+import ChatWindow from './ChatWindow.js';
 import './Chat.scss';
 
 class Chat extends Component{
-    render(){
-        let messages = [<ChatMessage key="1" />];
+    constructor(props = {limit:100}){
+        super(props);
+        this.state = {
+            messages: [],
+            chatters: [],
+        };
+        this.limit = props.limit;
+    }
 
-        return <div className="Chat">
-            <div className="header">{this.props.name}</div>
-            <div className="window">{messages}</div>
-        </div>;
+    addMessage(data){
+        this.setState({
+            messages: this.state.messages.concat([data])
+        });
+    }
+
+    setChatterList( chatters = [] ){
+        this.setState({
+            chatters: chatters,
+        });
+    }
+
+    joinChatter(data){
+        this.setState({
+            messages: this.state.messages.concat([data]),
+            chatters: this.state.chatters.concat([data.username]),
+        });
+    }
+
+
+    departChatter(data){
+        this.setState({
+            messages: this.state.messages.concat([data]),
+            chatters: this.state.chatters.filter(chatter => chatter.username !== data.username),
+        });
+    }
+
+    render(){
+        return <ChatWindow name={this.props.name} messages={this.state.messages} />;
     }
 }
 

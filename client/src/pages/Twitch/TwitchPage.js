@@ -5,11 +5,9 @@ import React, { Component/*, PureComponent*/ } from 'react';
 import TwitchAPIConnection from '../../plugins/TwitchAPIConnection/TwitchAPIConnection.js';
 import TwitchChatConnection from '../../plugins/TwitchChatConnection/TwitchChatConnection';
 import ConnectionStatus from '../../comps/ConnectionStatus/ConnectionStatus.js';
+import StreamInfo from '../../comps/StreamInfo/StreamInfo.js';
 import Chat from '../../comps/Chat/Chat.js';
-import SoundPlay from '../../comps/SoundPlay/SoundPlay.js';
 import TwitchApiCredentials from '../../plugins/TwitchApiCredentials/TwitchApiCredentials.js';
-import { Link } from 'react-router-dom';
-// import { Redirect } from 'react-router-dom';
 import './TwitchPage.scss';
 
 class TwitchPage extends Component {
@@ -21,62 +19,44 @@ class TwitchPage extends Component {
             connectionEstablished: false,
             userId: '',
             displayName: '',
+            streamerDisplayName: '',
             name: '',
             image: '',
             streamId: '',
             title: '',
-            viewersCount: false,
         };
     }
 
     componentDidMount() {
         this.api = new TwitchAPIConnection( this.streamer , this.onStreamUpdate.bind(this) );
-        this.chat = new TwitchChatConnection( this.streamer , this.onChatUpdate.bind(this) );
+        this.IRC = new TwitchChatConnection( this.streamer, this.streamer , sessionStorage.twitchOAuthToken,  this.onChatUpdate.bind(this) );
     }
 
     componentWillUnmount() {
         this.api.destroy();
-        this.chat.destroy();
+        this.IRC.destroy();
     }
 
     onStreamUpdate(data){
-        console.log('onStreamUpdate', data);
-        this.setState( function(prevState, props) {
-            let addProps = {
-                connectionEstablished: true,
-                viewersCountDiff: 0,
-            };
-
-            if(data.hasOwnProperty('viewersCount')){
-                if(prevState.viewersCount === false){
-                    addProps.viewersCountDiff = 0;
-                }
-                else if(prevState.viewersCount !== data.viewersCount) {
-                    addProps.viewersCountDiff = data.viewersCount - prevState.viewersCount;
-                }
-            }
-            return Object.assign(addProps, data)
-        });
+        this.setState( Object.assign({connectionEstablished: true}, data) );
     }
 
     onChatUpdate(data){
-        console.log('onChatUpdate', data);
-        // this.setState( function(prevState, props) {
-        //     let addProps = {
-        //         connectionEstablished: true,
-        //         viewersCountDiff: 0,
-        //     };
-        //
-        //     if(data.hasOwnProperty('viewersCount')){
-        //         if(prevState.viewersCount === false){
-        //             addProps.viewersCountDiff = 0;
-        //         }
-        //         else if(prevState.viewersCount !== data.viewersCount) {
-        //             addProps.viewersCountDiff = data.viewersCount - prevState.viewersCount;
-        //         }
-        //     }
-        //     return Object.assign(addProps, data)
-        // });
+        // console.log('onChatUpdate', data);
+        data = Object.assign({noSound: this.streamer === data.username},data);
+        if(data.command=== 'PRIVMSG'){
+            this.chat.addMessage(data);
+        }
+        else if(data.command=== 'JOIN'){
+            this.chat.joinChatter(data);
+        }
+        else if(data.command=== 'PART'){
+            this.chat.departChatter(data);
+        }
+        else if(data.command=== 'NAMES'){
+            this.chat.setChatterList(data.message);
+            this.setState({viewersCount: data.message.length});
+        }
     }
 
     generateAuthUrl() {
@@ -99,40 +79,24 @@ class TwitchPage extends Component {
             '&scope=' + this.credentials.oAuth_scope;
     }
 
-
-
     render () {
         if(!sessionStorage.twitchOAuthToken){
             sessionStorage.openedStreamer = this.streamer;
             window.location.href = this.generateAuthUrl();
-            // return <Redirect to={ this.generateAuthUrl() } />;
             return null;
         }
 
-        let sound = null;
-        if(this.state.viewersCountDiff > 0){
-            sound = <SoundPlay src="/sounds/hello-button.mp3"/>;
-        }
-        else if(this.state.viewersCountDiff < 0){
-            sound = <SoundPlay src="/sounds/bah-bye.mp3"/>;
-        }
-        const link ='https://twitch.tv/'+this.streamer;
-
-
         return <div className="TwitchPage">
-            <ConnectionStatus connected={this.state.connectionEstablished}/>
-            <h1>{this.streamer} <Link to='/' className="homeLink" /></h1>
-            <table className="info">
-                <tbody>
-                    <tr><td>Name</td><td>{this.state.displayName}</td></tr>
-                    <tr><td>Stream</td><td>{this.state.title}</td></tr>
-                    <tr><td>Watching</td><td>{this.state.viewersCount}</td></tr>
-                    <tr><td>Link</td><td><a href={link} target="_blanc">{link}</a></td></tr>
-                </tbody>
-            </table>
-            <div className="avatar" style={{backgroundImage: 'url('+this.state.image+')'}} />
-            <Chat name="Twitch"/>
-            {sound}
+            <StreamInfo
+                apiConnected={this.state.connectionEstablished}
+                displayName={this.state.displayName}
+                title={this.state.title}
+                streamer={this.streamer}
+                streamerDisplayName={this.state.streamerDisplayName}
+                image={this.state.image}
+                viewersCount={this.state.viewersCount}
+                link={ 'https://twitch.tv/' + this.streamer }/>
+            <Chat ref={chat=>this.chat=chat} name="Twitch" />
         </div>;
     }
 }
