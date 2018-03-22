@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-// import Connection from './plugins/Connection/Connection.js';
-// import ConnectionStatus from './comps/ConnectionStatus/ConnectionStatus.js';
 import TwitchPage from './pages/Twitch/TwitchPage.js';
 import OAuth from './pages/OAuth/OAuth.js';
 import Home from './pages/Home/Home.js';
@@ -38,16 +36,8 @@ class App extends Component {
                 <div className="App">
                     <Switch>
                         <Route exact path='/oauth' component={OAuth} />
-                        <Route exact path='/:streamer' component={TwitchPage} />
+                        <Route exact path='/:channel' component={TwitchPage} />
                         <Route exact path='/' component={Home} />
-                        {/*<Route exact path='/' render={(props)=>{
-                            return <div>
-                                <ConnectionStatus connected={this.state.connectionEstablished}/>
-                                <Section>
-                                    <Header>Worked today</Header>
-                                </Section>
-                            </div>
-                        }} />*/}
                         <Redirect to="/" />
                     </Switch>
                 </div>

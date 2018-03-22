@@ -23,10 +23,16 @@ class ChatMessage extends Component{
             </div>;
         }
         else if(data.command === 'PRIVMSG'){
+            const twoDigit = number => number < 10 ? '0'+number : number,
+                time = data.tags ? new Date(Number(data.tags['tmi-sent-ts'])) : null,
+                timeSpan = !time ? null : <span className="time">{
+                    twoDigit( time.getHours() ) +':'+ twoDigit(time.getMinutes())
+                } </span>;
             return <div className='message'>
+                {timeSpan}
                 <span className='name'>{data.username}</span>: { data.message }
-                {/*{data.noSound ? null : <SoundPlay src="/sounds/icq-old-sound.mp3"/>}*/}
-                <SoundPlay src="/sounds/icq-old-sound.mp3"/>
+                {data.noSound ? null : <SoundPlay src="/sounds/icq-old-sound.mp3"/>}
+                {/*<SoundPlay src="/sounds/icq-old-sound.mp3"/>*/}
             </div>;
         }
 

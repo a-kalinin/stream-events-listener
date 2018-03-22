@@ -8,7 +8,9 @@ class TwitchApiCredentials {
         this.chat_client_id = '6ywj292svk6fs5953qqnu6kwi6d65r';
         this.chat_client_secret = '6jqf6w8k2nvfysqiahtq5upx84vvo3';
         this.oAuth_redirectURI = 'http://localhost:4444/oauth';
-        this.oAuth_scope = 'user_read+chat_login';
+        this.oAuth_chatScope = 'user_read+chat_login';
+        this.oAuth_apiScope = 'chat_login+user:read:email';
+        this.oAuth_commonScope = 'chat_login+user_read+user:read:email';
     }
 
 }

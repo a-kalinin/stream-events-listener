@@ -6,19 +6,20 @@ import ChatWindow from './ChatWindow.js';
 import './Chat.scss';
 
 class Chat extends Component{
-    constructor(props = {limit:100}){
+    constructor(props){
         super(props);
         this.state = {
             messages: [],
             chatters: [],
         };
-        this.limit = props.limit;
     }
 
     addMessage(data){
-        this.setState({
-            messages: this.state.messages.concat([data])
-        });
+        let messages = this.state.messages.concat( [{idx: Date.now(), data}] );
+        if( this.props.limit && messages.length > this.props.limit ){
+            messages = messages.slice(messages.length - this.props.limit);
+        }
+        this.setState({messages});
     }
 
     setChatterList( chatters = [] ){
@@ -29,21 +30,20 @@ class Chat extends Component{
 
     joinChatter(data){
         this.setState({
-            messages: this.state.messages.concat([data]),
+            messages: this.state.messages.concat([{idx: Date.now(), data}]),
             chatters: this.state.chatters.concat([data.username]),
         });
     }
 
-
     departChatter(data){
         this.setState({
-            messages: this.state.messages.concat([data]),
+            messages: this.state.messages.concat([{idx: Date.now(), data}]),
             chatters: this.state.chatters.filter(chatter => chatter.username !== data.username),
         });
     }
 
     render(){
-        return <ChatWindow name={this.props.name} messages={this.state.messages} />;
+        return <ChatWindow messages={this.state.messages} />;
     }
 }
 

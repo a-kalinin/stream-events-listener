@@ -1,65 +1,133 @@
 .StreamInfo {
-  h1{
-    margin: 10px auto;
-    width: 300px;
+  padding: 5px 10px;
+  box-sizing: border-box;
 
-    div{
-      line-height: 100px;
-      height: 100px;
-      float:left;
-    }
+  section{
+    display: block;
+    padding: 5px 10px;
+    border-bottom: 1px solid #444;
+  }
+  section:last-child{
+    border-bottom: none;
   }
 
-  .info {
-    margin: 0 auto;
-    font-size: 24px;
-    color: #666;
-    background-color: #eee;
+  h3{
+    margin: 10px 0;
+    color: #356;
+  }
 
-    td {
-      padding: 10px;
+  .row{
+    margin-bottom:5px;
+
+    .name{
+      float:left;
+      font-weight: bold;
+      color: #333;
     }
-    td:first-child {
-      text-align: right;
-      color: #00B7FF;
+    .value{
+      float:right;
     }
 
-    td:last-child {
-      text-align: left;
+    .connection{
+      float:left;
+    }
+    .connection:before{
+      content: '';
+      display: inline-block;
+      width:15px;
+      height: 15px;
+      margin-left: 10px;
+      -webkit-border-radius: 50%;
+      -moz-border-radius: 50%;
+      border-radius: 50%;
+      background-color: red;
+    }
+    .connection[data-connected="true"]:before{
+      background-color: green;
+    }
+
+    &:after{
+      content: '';
+      clear: both;
+      display: block;
     }
   }
 
   .avatar{
     width: 150px;
     height: 100px;
-    margin-right: 10px;
+    margin: 10px auto;
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
   }
 
-  .homeLink{
-    display: inline-block;
-    position: relative;
-    width: 20px;
-    height: 20px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
+  .mute {
+    height: 30px;
+    line-height: 30px;
+
+    .muteButton {
+      margin-left: 10px;
+      font-size: 20px;
+    }
   }
-  .homeLink:before,
-  .homeLink:after{
-    content: '';
-    position: absolute;
-    bottom:50%;
-    left:50%;
-    width:15px;
-    border-bottom:1px solid red;
-    transform-origin: 0 50%;
-  }
-  .homeLink:before{
-    transform: rotate(-45deg) translateX(-50%);
-  }
-  .homeLink:after{
-    transform: rotate(45deg) translateX(-50%);
-  }
+
+
+
+
+  //background-color: #eee;
+
+  //h1{
+  //  margin: 10px auto;
+  //  width: 300px;
+  //
+  //  div{
+  //    line-height: 100px;
+  //    height: 100px;
+  //    float:left;
+  //  }
+  //}
+
+  //.info {
+  //  font-size: 24px;
+  //  color: #666;
+  //
+  //  td {
+  //    padding: 10px;
+  //  }
+  //  td:first-child {
+  //    text-align: right;
+  //    color: #00B7FF;
+  //  }
+  //
+  //  td:last-child {
+  //    text-align: left;
+  //  }
+  //}
+
+
+  //.homeLink{
+  //  display: inline-block;
+  //  position: relative;
+  //  width: 20px;
+  //  height: 20px;
+  //  border: 1px solid #ddd;
+  //  background-color: #f9f9f9;
+  //}
+  //.homeLink:before,
+  //.homeLink:after{
+  //  content: '';
+  //  position: absolute;
+  //  bottom:50%;
+  //  left:50%;
+  //  width:15px;
+  //  border-bottom:1px solid red;
+  //  transform-origin: 0 50%;
+  //}
+  //.homeLink:before{
+  //  transform: rotate(-45deg) translateX(-50%);
+  //}
+  //.homeLink:after{
+  //  transform: rotate(45deg) translateX(-50%);
+  //}
 }

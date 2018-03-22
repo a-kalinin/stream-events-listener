@@ -16,9 +16,11 @@ class ChatWindow extends Component{
         }
     }
     render(){
-        let messages = this.props.messages.map((msg, i)=><ChatMessage key={i} data={msg} />);
+        let messages = this.props.messages.map( msg => {
+            isNaN(msg.idx) && console.log(msg);
+            return <ChatMessage key={msg.idx} data={msg.data} />;
+        });
         return <div className="ChatWindow">
-            <div className="header">{this.props.name}</div>
             <div ref={viewport => this.viewport = viewport} className="window">{messages}</div>
         </div>;
     }

@@ -46,6 +46,7 @@ class TwitchChatConnection {
     };
 
     handleClose(){
+        this.eventHandler && this.eventHandler({command:'DISCONNECT'});
         console.warn('Disconnected from the chat server.');
     };
 
@@ -66,12 +67,12 @@ class TwitchChatConnection {
                 command: null,
                 original: rawMessage,
                 channel: null,
-                username: null
+                username: null,
             },
             tagsIncluded = rawMessage[0] === '@',
             tagsString = tagsIncluded && rawMessage.slice(1).split(' ')[0],
             tagsArray = tagsString && tagsString.split(';'),
-            tagsStrippedString = tagsIncluded ? ':' + rawMessage.split(' ').slice(1).join(' ') : rawMessage,
+            tagsStrippedString = tagsIncluded ? rawMessage.split(' ').slice(1).join(' ') : rawMessage,
             commonRegExp = /^:(\S+)!(?:\S+)@(?:\S+).tmi.twitch.tv (JOIN|PART|PRIVMSG) #(\S+) ?:?(.*)\s/,
             matches = tagsStrippedString.match(commonRegExp),
             userListRegExp = /^:(\S+).tmi.twitch.tv 353 (?:\S+) = #(\S+) :(.*)/;

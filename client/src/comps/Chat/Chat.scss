@@ -1,8 +1,6 @@
 .ChatWindow {
-  display: inline-block;
   width: 400px;
   height: 400px;
-  border: 1px solid #ddd;
 
   .header {
     font-size: 150%;
@@ -15,7 +13,7 @@
     box-sizing: border-box;
     padding: 2px 4px;
     overflow: auto;
-    height: 370px;
+    height: 100%;
 
     & > div{
       padding: 2px 0;

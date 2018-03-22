@@ -7,7 +7,6 @@ import { Redirect } from 'react-router-dom';
 class OAuth extends Component {
     constructor(props){
         super(props);
-        this.streamer = props.match.params.streamer;
         this.state = {
             hasToken: false
         };
@@ -26,7 +25,7 @@ class OAuth extends Component {
             const state = hashMatch(hash, /state=(\w+)/);
             if (sessionStorage.twitchOAuthState === state) {
                 sessionStorage.twitchOAuthToken = tokenInHash;
-                console.log(tokenInHash);
+                // console.log(tokenInHash);
                 this.setState({hasToken: true});
             }
         }
@@ -36,9 +35,9 @@ class OAuth extends Component {
     }
 
     render () {
-        if(this.state.hasToken && sessionStorage.openedStreamer){
-            const url = '/' + sessionStorage.openedStreamer;
-            sessionStorage.removeItem('openedStreamer');
+        if(this.state.hasToken && sessionStorage.openedChannel){
+            const url = '/' + sessionStorage.openedChannel;
+            sessionStorage.removeItem('openedChannel');
             return <Redirect to={url} />
         }
         return 'There is no auth token or chosen streamer! =(';
