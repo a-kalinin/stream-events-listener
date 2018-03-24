@@ -10,7 +10,6 @@ class Chat extends Component{
         super(props);
         this.state = {
             messages: [],
-            chatters: [],
         };
     }
 
@@ -22,23 +21,15 @@ class Chat extends Component{
         this.setState({messages});
     }
 
-    setChatterList( chatters = [] ){
-        this.setState({
-            chatters: chatters,
-        });
-    }
-
     joinChatter(data){
         this.setState({
             messages: this.state.messages.concat([{idx: Date.now(), data}]),
-            chatters: this.state.chatters.concat([data.username]),
         });
     }
 
     departChatter(data){
         this.setState({
             messages: this.state.messages.concat([{idx: Date.now(), data}]),
-            chatters: this.state.chatters.filter(chatter => chatter.username !== data.username),
         });
     }
 

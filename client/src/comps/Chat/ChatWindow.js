@@ -16,10 +16,7 @@ class ChatWindow extends Component{
         }
     }
     render(){
-        let messages = this.props.messages.map( msg => {
-            isNaN(msg.idx) && console.log(msg);
-            return <ChatMessage key={msg.idx} data={msg.data} />;
-        });
+        let messages = this.props.messages.map( msg => <ChatMessage key={msg.idx} data={msg.data} emoteSize={1} /> );
         return <div className="ChatWindow">
             <div ref={viewport => this.viewport = viewport} className="window">{messages}</div>
         </div>;

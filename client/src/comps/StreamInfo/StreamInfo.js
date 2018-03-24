@@ -6,10 +6,6 @@ import { Link } from 'react-router-dom';
 import './StreamInfo.scss';
 
 class StreamInfo extends Component{
-    constructor(props){
-        super(props);
-    }
-
     onSoundMuteToggle(){
         this.props.onSoundMuteToggle();
     }

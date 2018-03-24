@@ -7,6 +7,8 @@
   & > div{
     float: left;
     height: 100%;
+    padding: 5px 10px;
+    box-sizing: border-box;
   }
 
   &:after{
@@ -38,8 +40,17 @@
   }
 
 
-  .chatMembers{
-    background-color: #eee;
+
+  .message,
+  .member{
+    padding: 3px 2px;
+    animation: newItemAnimation 1s linear both 60;
+  }
+
+  @keyframes newItemAnimation{
+    0%{ background-color: transparent; }
+    50%{ background-color: #ad9; }
+    100%{ background-color: transparent; }
   }
 
 }

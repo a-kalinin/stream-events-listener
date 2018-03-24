@@ -193,8 +193,6 @@ class TwitchConnection {
                 method: 'GET', headers: myHeaders, cache: 'no-store'
             };
 
-        if(!id) debugger;
-
         fetch(url, myInit).then(function (response) {
             return response.json();
         }).then(function (response) {

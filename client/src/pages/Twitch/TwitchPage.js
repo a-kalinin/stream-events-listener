@@ -6,6 +6,7 @@ import TwitchAPIConnection from '../../plugins/TwitchAPIConnection/TwitchAPIConn
 import TwitchChatConnection from '../../plugins/TwitchChatConnection/TwitchChatConnection';
 import StreamInfo from '../../comps/StreamInfo/StreamInfo.js';
 import Chat from '../../comps/Chat/Chat.js';
+import ChatMembers from '../../comps/Chat/ChatMembers.js';
 import TwitchApiCredentials from '../../plugins/TwitchApiCredentials/TwitchApiCredentials.js';
 import './TwitchPage.scss';
 
@@ -38,6 +39,7 @@ class TwitchPage extends Component {
             apiConnectionEstablished: false,
             chatConnectionEstablished: false,
             chattersCount: '',
+            chattersList: [],
             soundMuted: localStorage.getItem('soundsMuted') === 'true',
         };
     }
@@ -80,13 +82,14 @@ class TwitchPage extends Component {
         }
         else if(data.command=== 'JOIN'){
             this.chat.joinChatter(data);
+            this.setState({chattersList: this.state.chattersList.concat([data.username])})
         }
         else if(data.command=== 'PART'){
             this.chat.departChatter(data);
+            this.setState({chattersList: this.state.chattersList.filter(chatter => chatter.username !== data.username)})
         }
         else if(data.command=== 'NAMES'){
-            this.chat.setChatterList(data.message);
-            this.setState({chattersCount: data.message.length});
+            this.setState({chattersCount: data.message.length, chattersList: data.message});
         }
         else if(data.command=== 'DISCONNECT'){
             connected = false;
@@ -136,7 +139,7 @@ class TwitchPage extends Component {
                 onSoundMuteToggle={this.onSoundMuteToggle.bind(this)}
                 soundMuted={this.state.soundMuted}/>
             <Chat ref={chat=>this.chat=chat} limit={200}/>
-            <div className="chatMembers" />
+            <ChatMembers members={this.state.chattersList} />
         </div>;
     }
 }

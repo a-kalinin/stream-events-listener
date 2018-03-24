@@ -75,7 +75,8 @@ class TwitchChatConnection {
             tagsStrippedString = tagsIncluded ? rawMessage.split(' ').slice(1).join(' ') : rawMessage,
             commonRegExp = /^:(\S+)!(?:\S+)@(?:\S+).tmi.twitch.tv (JOIN|PART|PRIVMSG) #(\S+) ?:?(.*)\s/,
             matches = tagsStrippedString.match(commonRegExp),
-            userListRegExp = /^:(\S+).tmi.twitch.tv 353 (?:\S+) = #(\S+) :(.*)/;
+            userListRegExp = /^:(\S+).tmi.twitch.tv 353 (?:\S+) = #(\S+) :(.*)/,
+            userListMatches = tagsStrippedString.match(userListRegExp);
 
         // GLOBALUSERSTATE
         // CLEARCHAT
@@ -95,13 +96,13 @@ class TwitchChatConnection {
         // :<user>.tmi.twitch.tv 353 <user> = #<channel> :<user> <user2> <user3>
         // :<user>.tmi.twitch.tv 353 <user> = #<channel> :<user4> <user5> ... <userN>
         // :<user>.tmi.twitch.tv 366 <user> #<channel> :End of /NAMES list
-        else if(matches = tagsStrippedString.match(userListRegExp)){
+        else if(userListMatches){
             let strings = tagsStrippedString.split("/n"),
                 users = [];
 
-            parsedMessage.username = matches[1];
+            parsedMessage.username = userListMatches[1];
             parsedMessage.command = 'NAMES';
-            parsedMessage.channel = matches[2];
+            parsedMessage.channel = userListMatches[2];
 
             for(let string of strings){
                 let [,,,usersInString] = string.match(userListRegExp);
