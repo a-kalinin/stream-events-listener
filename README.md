@@ -1,5 +1,8 @@
 # stream-events-listener
 
+!!! CURRENTLY UNSUPPORTED
+Use it for own risk.
+
 Tool to monitor stream events
 
 Supported services - Twitch
